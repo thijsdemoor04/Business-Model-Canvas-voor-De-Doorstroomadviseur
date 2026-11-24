@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>De Doorstroomadviseur - Business Model Canvas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --r3: #afd4e6;
+      --r5: #8dc0de;
+      --r7: #7cb3d5;
+      --bg-color: #e2e8f0;
+      --card-bg: #f5f9fc;
+      --text-main: #1e293b;
+      --text-muted: #475569;
+      --accent: #7cb3d5;
+      --accent-light: #e2e8f0;
+      --hover-shadow: 0 10px 25px rgba(30, 41, 59, 0.10);
+      --border-color: #94a3b8;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      font-family: 'Open Sans', sans-serif;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      margin: 40px 20px 20px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 600;
+      font-size: 34px;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin: 0;
+    }
+
+    /* BMC Grid Layout */
+    .bmc-container {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: minmax(160px, 1fr) minmax(160px, 1fr) minmax(140px, auto);
+      gap: 16px;
+      width: 100%;
+      max-width: 1200px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* Grid Area Assignments */
+    #kp { grid-column: 1 / 3; grid-row: 1 / 3; }
+    #ka { grid-column: 3 / 5; grid-row: 1 / 2; }
+    #kr { grid-column: 3 / 5; grid-row: 2 / 3; }
+    #vp { grid-column: 5 / 7; grid-row: 1 / 3; }
+    #cr { grid-column: 7 / 9; grid-row: 1 / 2; }
+    #ch { grid-column: 7 / 9; grid-row: 2 / 3; }
+    #cs { grid-column: 9 / 11; grid-row: 1 / 3; }
+    #cost { grid-column: 1 / 6; grid-row: 3 / 4; }
+    #rev { grid-column: 6 / 11; grid-row: 3 / 4; }
+
+    /* Interactive Cards */
+    .bmc-card {
+      background: var(--card-bg);
+      font-family: inherit;
+      border: none;
+      border-radius: 12px;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(30, 41, 59, 0.06);
+    }
+
+    .bmc-card:hover,
+    .bmc-card:focus-visible {
+      transform: translateY(-4px);
+      box-shadow: var(--hover-shadow);
+      background-color: #ffffff;
+      outline: 2px solid var(--r7);
+      outline-offset: 2px;
+    }
+
+    .bmc-card svg {
+      width: 40px;
+      height: 40px;
+      color: var(--r7);
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .bmc-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 19px;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-main);
+    }
+
+    .click-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .bmc-card:hover .click-hint,
+    .bmc-card:focus-visible .click-hint {
+      opacity: 1;
+    }
+
+    /* Modal / Pop-up Styling */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(30, 41, 59, 0.45);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: none;
+      width: 100%;
+      max-width: 600px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--accent-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: var(--card-bg);
+      z-index: 10;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 26px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus-visible {
+      background: var(--accent-light);
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .modal-body {
+      padding: 32px;
+    }
+
+    .modal-body .item-group {
+      margin-bottom: 24px;
+    }
+
+    .modal-body .item-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .modal-body h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin: 0 0 8px 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .modal-body h3::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background-color: var(--r7);
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .modal-body p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      margin: 0;
+      padding-left: 16px;
+    }
+
+    /* Scrollbar styling for modal */
+    .modal-content::-webkit-scrollbar { width: 8px; }
+    .modal-content::-webkit-scrollbar-track { background: transparent; }
+    .modal-content::-webkit-scrollbar-thumb { background: var(--r3); border-radius: 4px; }
+    .modal-content::-webkit-scrollbar-thumb:hover { background: var(--r7); }
+
+    @media (max-width: 900px) {
+      .bmc-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        gap: 12px;
+      }
+      #kp, #ka, #kr, #vp, #cr, #ch, #cs, #cost, #rev {
+        grid-column: 1 / -1;
+        grid-row: auto;
+      }
+      .bmc-card {
+        padding: 20px;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 16px;
+        text-align: left;
+      }
+      .bmc-card svg { margin-bottom: 0; }
+      .click-hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>De Doorstroomadviseur</h1>
+    <p class="subtitle">Interactief Business Model Canvas. Klik op een onderdeel voor details.</p>
+  </header>
+
+  <main class="bmc-container">
+
+    <!-- Key Partners -->
+    <button type="button" class="bmc-card" id="kp" onclick="openModal('kp')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      <h2>Key Partners</h2>
+      <span class="click-hint">Bekijk partners</span>
+    </button>
+
+    <!-- Key Activities -->
+    <button type="button" class="bmc-card" id="ka" onclick="openModal('ka')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+      <h2>Kernactiviteiten</h2>
+      <span class="click-hint">Bekijk activiteiten</span>
+    </button>
+
+    <!-- Key Resources -->
+    <button type="button" class="bmc-card" id="kr" onclick="openModal('kr')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+      <h2>Key Resources</h2>
+      <span class="click-hint">Bekijk middelen</span>
+    </button>
+
+    <!-- Value Propositions -->
+    <button type="button" class="bmc-card" id="vp" onclick="openModal('vp')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+      <h2>Waardeproposities</h2>
+      <span class="click-hint">Bekijk waarde</span>
+    </button>
+
+    <!-- Customer Relationships -->
+    <button type="button" class="bmc-card" id="cr" onclick="openModal('cr')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+      <h2>Klantrelaties</h2>
+      <span class="click-hint">Bekijk relaties</span>
+    </button>
+
+    <!-- Channels -->
+    <button type="button" class="bmc-card" id="ch" onclick="openModal('ch')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+      <h2>Kanalen</h2>
+      <span class="click-hint">Bekijk kanalen</span>
+    </button>
+
+    <!-- Customer Segments -->
+    <button type="button" class="bmc-card" id="cs" onclick="openModal('cs')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+      <h2>Klantsegmenten</h2>
+      <span class="click-hint">Bekijk doelgroep</span>
+    </button>
+
+    <!-- Cost Structure -->
+    <button type="button" class="bmc-card" id="cost" onclick="openModal('cost')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+      <h2>Kostenstructuur</h2>
+      <span class="click-hint">Bekijk kosten</span>
+    </button>
+
+    <!-- Revenue Streams -->
+    <button type="button" class="bmc-card" id="rev" onclick="openModal('rev')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <h2>Inkomstenstromen</h2>
+      <span class="click-hint">Bekijk inkomsten</span>
+    </button>
+
+  </main>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2 id="modalTitle">Titel</h2>
+        <button type="button" class="close-btn" aria-label="Sluit venster" onclick="closeModal(true)">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Content gets injected here by JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const bmcData = {
+      'cs': {
+        title: 'Klantsegmenten',
+        content: `
+          <div class="item-group">
+            <h3>Ouderen vanaf circa 65 jaar</h3>
+            <p>De dienstverlening richt zich op ouderen die in een ruime eengezinswoning wonen die niet meer goed bij hun situatie past. De woning kan bijvoorbeeld te groot zijn, veel onderhoud vragen of door trappen minder toegankelijk worden. Vaak zien ouderen wel dat een verhuizing wenselijk is, maar vinden zij het lastig om deze stap te zetten.</p>
+          </div>
+          <div class="item-group">
+            <h3>Kinderen en mantelzorgers</h3>
+            <p>Ook familieleden vormen een belangrijke doelgroep. Zij maken zich mogelijk zorgen over de woonsituatie van hun ouders en willen helpen bij het vinden van een passende woning. Door gebrek aan tijd of kennis is het echter niet altijd mogelijk om het gehele verhuisproces zelf te begeleiden.</p>
+          </div>
+          <div class="item-group">
+            <h3>Starters en jonge gezinnen</h3>
+            <p>Deze groep profiteert indirect van de dienstverlening. Wanneer ouderen verhuizen naar een woning die beter bij hun situatie past, komen grotere eengezinswoningen vrij voor starters en jonge gezinnen die op zoek zijn naar woonruimte.</p>
+          </div>`
+      },
+      'vp': {
+        title: 'Waardeproposities',
+        content: `
+          <div class="item-group">
+            <h3>Ontzorging tijdens het verhuisproces</h3>
+            <p>Ouderen krijgen begeleiding bij het gehele verhuisproces, van de verkoop van de huidige woning tot de aankoop van een nieuwe woning en de verhuizing zelf. Hierdoor blijft het proces overzichtelijk en wordt de stress verminderd.</p>
+          </div>
+          <div class="item-group">
+            <h3>Zelf de regie houden</h3>
+            <p>Ouderen blijven zelf beslissen over hun verhuizing en de keuzes die daarbij horen. De doorstroomadviseur biedt ondersteuning en overzicht, zodat zij met meer vertrouwen beslissingen kunnen nemen en de verhuizing minder snel uitstellen.</p>
+          </div>
+          <div class="item-group">
+            <h3>Aandacht voor persoonlijke en praktische zaken</h3>
+            <p>Naast de praktische organisatie is er aandacht voor het afscheid nemen van de vertrouwde woning en de herinneringen die daarbij horen. Ook krijgen ouderen hulp bij het uitzoeken van spullen en het regelen van financiële en juridische zaken.</p>
+          </div>
+          <div class="item-group">
+            <h3>Een vast en vertrouwd aanspreekpunt</h3>
+            <p>De doorstroomadviseur neemt de coördinatie tussen makelaars, notarissen, hypotheekadviseurs en verhuisbedrijven op zich. Hierdoor hoeven ouderen niet zelf alle contacten te onderhouden.</p>
+          </div>`
+      },
+      'ch': {
+        title: 'Kanalen',
+        content: `
+          <div class="item-group">
+            <h3>Lokale netwerken en samenwerkingen</h3>
+            <p>De doelgroep kan worden bereikt via organisaties en professionals die al contact hebben met ouderen. Denk aan huisartsen, wijkverpleegkundigen, welzijnsorganisaties, notarissen en makelaars.</p>
+          </div>
+          <div class="item-group">
+            <h3>Lokale kranten en informatiefolders</h3>
+            <p>Veel ouderen maken gebruik van lokale media om op de hoogte te blijven van ontwikkelingen in hun omgeving. Advertenties in huis-aan-huisbladen en folders op geschikte locaties kunnen helpen.</p>
+          </div>
+          <div class="item-group">
+            <h3>Informatiebijeenkomsten en spreekuren</h3>
+            <p>Door bijeenkomsten te organiseren in wijkcentra, bibliotheken en bij seniorenverenigingen kunnen ouderen op een laagdrempelige manier kennismaken met de dienstverlening en vragen stellen.</p>
+          </div>
+          <div class="item-group">
+            <h3>Een website en sociale media</h3>
+            <p>Kinderen en mantelzorgers zoeken mogelijk online naar hulp voor hun ouders. Een duidelijke website met informatie over de werkwijze, kosten en mogelijkheden helpt hen om de dienstverlening te beoordelen.</p>
+          </div>`
+      },
+      'cr': {
+        title: 'Klantrelaties',
+        content: `
+          <div class="item-group">
+            <h3>Persoonlijke begeleiding</h3>
+            <p>Een verhuizing is voor ouderen vaak een grote stap. Daarom is het belangrijk om een vertrouwensband op te bouwen, goed te luisteren en voldoende tijd te nemen voor vragen en onzekerheden. Persoonlijk contact staat hierbij centraal.</p>
+          </div>
+          <div class="item-group">
+            <h3>Eén vaste adviseur</h3>
+            <p>Gedurende het gehele traject heeft de oudere contact met dezelfde doorstroomadviseur. Deze kent de persoonlijke situatie, wensen en aandachtspunten en kan de begeleiding hierop afstemmen.</p>
+          </div>
+          <div class="item-group">
+            <h3>Begeleiding tot na de verhuizing</h3>
+            <p>De ondersteuning stopt niet bij het regelen van de verhuizing. Ook tijdens de laatste stappen en na aankomst in de nieuwe woning blijft de adviseur betrokken, zodat de overgang zo soepel mogelijk verloopt.</p>
+          </div>`
+      },
+      'rev': {
+        title: 'Inkomstenstromen',
+        content: `
+          <div class="item-group">
+            <h3>Betaling per uur</h3>
+            <p>Klanten betalen voor de tijd die wordt besteed aan advies en begeleiding. Dit is inzichtelijk, maar vooraf is niet altijd duidelijk hoeveel uren het gehele traject zal kosten.</p>
+          </div>
+          <div class="item-group">
+            <h3>Vaste prijzen voor verschillende pakketten</h3>
+            <p>Klanten kunnen kiezen uit verschillende vormen van begeleiding, van een basispakket (advies en plan van aanpak) tot uitgebreidere pakketten inclusief volledige coördinatie en persoonlijke begeleiding.</p>
+          </div>
+          <div class="item-group">
+            <h3>Vergoedingen via samenwerkingspartners</h3>
+            <p>Het is mogelijk om afspraken te maken waarbij partners een vergoeding betalen voor het aanbrengen van klanten. Dit vraagt om duidelijke afspraken en openheid richting de klant om onafhankelijkheid te waarborgen.</p>
+          </div>
+          <div class="item-group">
+            <h3>Subsidies en gemeentelijke vergoedingen</h3>
+            <p>Mogelijk kunnen gemeenten een deel van de dienstverlening financieren vanuit projecten die gericht zijn op passend wonen en een betere doorstroming op de woningmarkt.</p>
+          </div>`
+      },
+      'kr': {
+        title: 'Key Resources',
+        content: `
+          <div class="item-group">
+            <h3>Kennis van de woningmarkt en verhuisproces</h3>
+            <p>De doorstroomadviseur moet inzicht hebben in de lokale woningmarkt en weten welke stappen nodig zijn bij de verkoop en aankoop van een woning, inclusief financiële en juridische zaken.</p>
+          </div>
+          <div class="item-group">
+            <h3>Persoonlijke vaardigheden</h3>
+            <p>Geduld, inlevingsvermogen en goed kunnen luisteren zijn nodig om ouderen te begeleiden. Daarnaast is het belangrijk overzicht te houden en complexe zaken eenvoudig uit te leggen.</p>
+          </div>
+          <div class="item-group">
+            <h3>Een betrouwbaar netwerk</h3>
+            <p>Goede contacten met makelaars, notarissen, verhuisbedrijven en andere professionals zijn belangrijk om klanten door te verwijzen en het proces soepel te laten verlopen.</p>
+          </div>
+          <div class="item-group">
+            <h3>Praktische hulpmiddelen</h3>
+            <p>Voor het uitvoeren van de werkzaamheden is vervoer, een geschikte werkplek en een veilig systeem voor klantgegevens, afspraken en planningen nodig.</p>
+          </div>`
+      },
+      'ka': {
+        title: 'Kernactiviteiten',
+        content: `
+          <div class="item-group">
+            <h3>Begeleiden en coördineren van het verhuisproces</h3>
+            <p>Samen met de oudere een stappenplan maken en de planning in de gaten houden. Daarbij worden de verschillende partijen op het juiste moment ingeschakeld, zodat alles op elkaar aansluit.</p>
+          </div>
+          <div class="item-group">
+            <h3>Wensen en mogelijkheden in kaart brengen</h3>
+            <p>Door gesprekken te voeren wordt duidelijk welke woning passend is, wat financieel mogelijk is en welke ondersteuning nodig is, rekening houdend met persoonlijke gevoelens.</p>
+          </div>
+          <div class="item-group">
+            <h3>Een betrouwbaar netwerk onderhouden</h3>
+            <p>Voor een goede begeleiding is samenwerking met andere professionals nodig. De adviseur bouwt een netwerk op van makelaars, notarissen, verhuisbedrijven e.d.</p>
+          </div>
+          <div class="item-group">
+            <h3>Praktische hulp bieden</h3>
+            <p>Ondersteuning bieden bij het uitzoeken van spullen, het regelen van administratie en het begeleiden van bezichtigingen en overdrachtsmomenten.</p>
+          </div>`
+      },
+      'kp': {
+        title: 'Key Partners',
+        content: `
+          <div class="item-group">
+            <h3>Partijen die het verhuisproces uitvoeren</h3>
+            <p>Makelaars, hypotheekadviseurs, notarissen, verhuisbedrijven, woningontruimers en klusbedrijven. Door met hen samen te werken kan de adviseur de werkzaamheden optimaal afstemmen.</p>
+          </div>
+          <div class="item-group">
+            <h3>Partijen die ouderen doorverwijzen</h3>
+            <p>Huisartsen, wijkverpleegkundigen, ouderenbonden, welzijnswerkers en gemeentelijke loketten staan in contact met ouderen en kunnen de dienstverlening onder de aandacht brengen.</p>
+          </div>
+          <div class="item-group">
+            <h3>Gemeenten en woningcorporaties</h3>
+            <p>Deze partijen hebben belang bij betere doorstroming. Samenwerking kan mogelijkheden bieden om ouderen te ondersteunen of gezamenlijke projecten en regelingen op te zetten.</p>
+          </div>`
+      },
+      'cost': {
+        title: 'Kostenstructuur',
+        content: `
+          <div class="item-group">
+            <h3>Marketing en het vinden van klanten</h3>
+            <p>Om de dienstverlening bekend te maken, zijn kosten nodig voor bijvoorbeeld een website, informatiefolders, advertenties en deelname aan netwerkbijeenkomsten.</p>
+          </div>
+          <div class="item-group">
+            <h3>Dagelijkse bedrijfskosten</h3>
+            <p>Het begeleiden van klanten brengt kosten met zich mee, zoals reiskosten, telefoonkosten, software (veilig klantsysteem) en eventuele kantoorruimte.</p>
+          </div>
+          <div class="item-group">
+            <h3>Tijd voor persoonlijke begeleiding</h3>
+            <p>Een groot deel van de kosten bestaat uit de eigen uren/tijd die nodig is voor gesprekken, advies en het coördineren van het verhuisproces (varieert per traject).</p>
+          </div>
+          <div class="item-group">
+            <h3>Verzekeringen en juridisch advies</h3>
+            <p>Een bedrijfsaansprakelijkheidsverzekering en duidelijk juridisch advies bij het opstellen van contracten om risico's te beperken en verantwoordelijkheden vast te leggen.</p>
+          </div>`
+      }
+    };
+
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    let lastFocusedElement = null;
+
+    function openModal(id) {
+      const data = bmcData[id];
+      const card = document.getElementById(id);
+      if (data && card) {
+        lastFocusedElement = card;
+        const svgIcon = card.querySelector('svg').outerHTML;
+        modalTitle.innerHTML = svgIcon + ' ' + data.title;
+        modalBody.innerHTML = data.content;
+        modalOverlay.classList.add('active');
+        modalOverlay.querySelector('.close-btn').focus();
+      }
+    }
+
+    function closeModal(event) {
+      if (event === true || event.target === modalOverlay) {
+        modalOverlay.classList.remove('active');
+        if (lastFocusedElement) {
+          lastFocusedElement.focus();
+          lastFocusedElement = null;
+        }
+      }
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && modalOverlay.classList.contains('active')) {
+        closeModal(true);
+      }
+    });
+  </script>
+</body>
+</html>
